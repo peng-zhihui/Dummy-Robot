@@ -11,6 +11,7 @@
 * 已添加无线示教器Peak软硬件工程（作为submodule）
 * 已添加REF的硬件设计文件
 * 已添加DummyStudio上位机
+* 已添加Dummy核心控制器的固件代码（使用说明见后文）
 
 ## 关于结构设计
 
@@ -33,9 +34,41 @@
 
 ## 关于固件
 
-这个机械臂的固件核心就是运动学姿态解算，这块我还在整理，后面会封装得更完善一些进行开源，现在写死的很多参数会设计成可配置的，**方便大家用本项目学习完后迁移到自己设计的机械臂中**。
+这个机械臂的固件核心就是运动学姿态解算，~~这块我还在整理，后面会封装得更完善一些进行开源~~，**已开源**，现在写死的很多参数会设计成可配置的，**方便大家用本项目学习完后迁移到自己设计的机械臂中**。
 
-Peak的固件基于X-Track项目，大家可以去Peak仓库查看。
+**REF的固件使用说明：**
+
+固件主要包括几大功能模块：
+
+* BSP驱动：板载的各种硬件驱动比如OLED、IMU、LED、蜂鸣器、非易失储存等等
+* 3rdParty库：包括U8G2的图形库和Fibre的序列化/反序列化库
+* Core：ST官方的HAL库
+* Driver：ARM的CMSIS驱动
+* Midwares：FreeRTOS支持包
+* Robot：核心机器人库，包括各种算法和驱动代码
+* UserApp：上层应用，可以基于我提供的API接口自行开发其他应用
+
+> * 其中OLED使用Arduino的U8G2库移植而来，可以方便地现实各种调试和系统信息，另外由于STM32的硬件I2C又BUG这里使用了软件I2C驱动屏幕，实测帧率比硬件I2C更高。
+
+`DummyRobot`类是Dummy的完整定义所在，初始化的时候需要设置好**步进电机驱动的信息**以及**自身的DH参数**：
+
+![](5.Docs/1.Images/fw1.jpg)
+
+其中驱动器信息包含：CAN节点ID、**是否反向**、减速器的减速比、**运动限制范围**。
+
+而DH参数的含义如下：
+
+![](5.Docs/1.Images/fw2.jpg)
+
+机械臂的构型需要满足Pieper判据（机器人的三个相邻关节轴交于一点或三轴线平行），才能得出解析解，所以大家可以根据Dummy的结构进行修改，然后自己替换DH参数即可以移植我的代码。
+
+> 关于位置的记忆，和上电零点校准：
+>
+> **由于绝对值编码器的位置只在一圈内有效，工业机械臂经过减速后为了获取绝对位置一般是做输出端编码，但是这样精度就降低了30倍（减速比），所以更合理的是做双编码器，而我这个项目中双编码器影响结构紧凑设计，所以用了更巧妙的方式：利用电机驱动的电流环控制上电后进行低力矩的无零点定向运动，碰到机械臂限位之后确认粗零点（无限位开关归零），然后根据单圈绝对值编码器的位置精调零点。这个方式的零点是没有误差的，而且几乎不受加工精度影响，因为在12度（360/30）内都是绝对值编码器的有效精度范围。**
+
+**Peak的固件说明：**
+
+Peak基于X-Track项目，大家可以去Peak仓库查看。
 
 ## 关于上位机
 
@@ -51,5 +84,14 @@ Peak的固件基于X-Track项目，大家可以去Peak仓库查看。
 
 最后，动力学部分还在开发中，这块暂时没有完全实现。上**述的运动学和动力学算法都强烈建议去看一下《机器人学导论》这本书**，里面写得非常详细。
 
- 
+---
+
+
+
+> **感谢以下项目作者：**
+>
+> * [unlir/XDrive: Stepper motor with multi-function interface and closed loop function. 具有多功能接口和闭环功能的步进电机。 (github.com)](https://github.com/unlir/XDrive)
+> * [odriverobotics/ODrive: High performance motor control (github.com)](https://github.com/odriverobotics/ODrive)
+> * [olikraus/u8g2: U8glib library for monochrome displays, version 2 (github.com)](https://github.com/olikraus/u8g2)
+> * [samuelsadok/fibre: Abstraction layer for painlessly building object oriented distributed systems that just work (github.com)](https://github.com/samuelsadok/fibre)
 

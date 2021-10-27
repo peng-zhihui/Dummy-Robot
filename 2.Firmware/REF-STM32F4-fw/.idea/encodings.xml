@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="Encoding">
+    <file url="file://$PROJECT_DIR$/Robot/actuator/mintasca" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/Robot/actuator/mintasca/sca.cpp" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/Robot/actuator/mintasca/sca.hpp" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/Robot/actuator/mintasca/sca_api.c" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/Robot/actuator/mintasca/sca_api.h" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/Robot/actuator/mintasca/sca_protocol.c" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/Robot/actuator/mintasca/sca_protocol.h" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/Robot/actuators/mintasca/sca.cpp" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/Robot/actuators/mintasca/sca.hpp" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/Robot/actuators/mintasca/sca_api.c" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/Robot/actuators/mintasca/sca_api.h" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/Robot/actuators/mintasca/sca_protocol.c" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/Robot/actuators/mintasca/sca_protocol.h" charset="GBK" />
+  </component>
+</project>

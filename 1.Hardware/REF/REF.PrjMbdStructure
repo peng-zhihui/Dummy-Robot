@@ -1,0 +1,4 @@
+Record=DiagramHierarchy|SourceDocument=REF.MbsDoc|Kind=Multi-board Schematic Module|Designator=2|Source=REF-Base\REF-Base.PrjPCB
+Record=SubProject|SourceDocument=REF.MbsDoc|ProjectPath=REF-Base\REF-Base.PrjPCB
+Record=DiagramHierarchy|SourceDocument=REF.MbsDoc|Kind=Multi-board Schematic Module|Designator=1|Source=REF-Unit\REF-Unit.PrjPCB
+Record=SubProject|SourceDocument=REF.MbsDoc|ProjectPath=REF-Unit\REF-Unit.PrjPCB
