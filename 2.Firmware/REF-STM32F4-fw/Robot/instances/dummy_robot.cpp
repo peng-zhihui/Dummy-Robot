@@ -277,3 +277,11 @@ void DummyHand::SetEnable(bool _enable)
     else
         SetMaxCurrent(0);
 }
+
+float DummyHand::GetAngle()
+{
+    uint8_t mode = 0x33;
+    txHeader.StdId = nodeID << 7 | mode;
+
+    CanSendMessage(get_can_ctx(hcan), canBuf, &txHeader);
+}

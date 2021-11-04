@@ -35,8 +35,6 @@ void ThreadControlLoop(void* argument)
         mpu6050.Update(true);
 
         dummy.UpdateJointPos();
-
-//        motorJ1.SetSpeedSetPoint(mpu6050.data.gz * 10000);
     }
 }
 

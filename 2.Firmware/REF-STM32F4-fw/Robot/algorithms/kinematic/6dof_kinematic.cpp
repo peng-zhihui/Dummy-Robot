@@ -134,8 +134,6 @@ DOF6Kinematic::SolveFK(const DOF6Kinematic::Joint6D_t &_inputJoint6D, DOF6Kinema
         sinq = sinf(q[i]);
         cosa = cosf(DH_matrix[i][3]);
         sina = sinf(DH_matrix[i][3]);
-        d = DH_matrix[i][1];
-        a = DH_matrix[i][2];
 
         R[i][0] = cosq;
         R[i][1] = -cosa * sinq;

@@ -23,6 +23,7 @@ public:
     void SetAngle(float _angle);
     void SetMaxCurrent(float _val);
     void SetEnable(bool _enable);
+    float GetAngle();
 
     // Communication protocol definitions
     auto MakeProtocolDefinitions()
