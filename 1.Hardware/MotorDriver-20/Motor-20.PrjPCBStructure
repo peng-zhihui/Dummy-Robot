@@ -1,0 +1,5 @@
+Record=TopLevelDocument|FileName=Drive.SchDoc|SheetNumber=1
+Record=NoMainPathDocument|SourceDocument=Drive.SchDoc|FileName=Interface.SchDoc|SheetNumber=1
+Record=NoMainPathDocument|SourceDocument=Drive.SchDoc|FileName=MCU.SchDoc|SheetNumber=1
+Record=NoMainPathDocument|SourceDocument=Drive.SchDoc|FileName=Port.SchDoc|SheetNumber=1
+Record=NoMainPathDocument|SourceDocument=Drive.SchDoc|FileName=Power.SchDoc|SheetNumber=1
