@@ -1,0 +1,11 @@
+<component name="CopyrightManager">
+  <settings>
+    <module2copyright>
+      <element module="All" copyright="ctrl-step" />
+    </module2copyright>
+    <LanguageOptions name="ObjectiveC">
+      <option name="separateBefore" value="true" />
+      <option name="separateAfter" value="true" />
+    </LanguageOptions>
+  </settings>
+</component>

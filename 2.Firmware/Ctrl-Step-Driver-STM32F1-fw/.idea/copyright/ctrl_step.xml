@@ -1,0 +1,6 @@
+<component name="CopyrightManager">
+  <copyright>
+    <option name="notice" value="Created with IDEA.&#10;Description: A fully open-sourced high performance unibody close-loop driver for  &#10;Step-Motor, which was used in my DummyRobot project:&#10;https://github.com/peng-zhihui/Dummy-Robot&#10;Based on XDrive project: https://github.com/unlir/XDrive&#10;@Author: Pengzhihui&#10;@Date: &amp;#36;{DATE} &amp;#36;{TIME}&#10;" />
+    <option name="myName" value="ctrl-step" />
+  </copyright>
+</component>
