@@ -60,8 +60,8 @@ private:
     Error_t errorCode;
     State_t state;
     uint32_t goPosition;
-    bool goDirection{};
-    uint16_t sampleCount{};
+    bool goDirection;
+    uint16_t sampleCount = 0;
     uint16_t sampleDataRaw[SAMPLE_COUNTS_PER_STEP]{};
     uint16_t sampleDataAverageForward[MOTOR_ONE_CIRCLE_HARD_STEPS + 1]{};
     uint16_t sampleDataAverageBackward[MOTOR_ONE_CIRCLE_HARD_STEPS + 1]{};
