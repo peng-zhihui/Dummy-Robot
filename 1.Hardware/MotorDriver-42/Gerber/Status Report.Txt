@@ -1,0 +1,12 @@
+Output: NC Drill Files
+Type  : NC Drill
+From  : Project [Motor-42.PrjPCB]
+   Generated File[Motor-42.TXT]
+   Generated File[Motor-42.LDP]
+   Generated File[Motor-42.DRR]
+
+
+Files Generated   : 3
+Documents Printed : 0
+
+Finished Output Generation At 19:21:46 On ÖÜ¶þ 01-18
