@@ -1,0 +1,30 @@
+------------------------------------------------------------------------------------------
+Gerber File Extension Report For: Motor-57.GBR   ÖÜ¶þ 01-18  19:39:48
+------------------------------------------------------------------------------------------
+
+
+------------------------------------------------------------------------------------------
+Layer Extension     Layer Description                      
+------------------------------------------------------------------------------------------
+.GTO                Top Overlay                             
+.GTP                Top Paste                               
+.GTS                Top Solder                              
+.GTL                Top1                                    
+.G1                 Signal2                                 
+.G2                 Gnd3                                    
+.GBL                Bottom4                                 
+.GBS                Bottom Solder                           
+.GBP                Bottom Paste                            
+.GBO                Bottom Overlay                          
+.GM1                Mechanical 1                            
+.GM10               Mechanical 10                           
+.GM12               Mechanical 12                           
+.GM13               Mechanical 13                           
+.GM14               Mechanical 14                           
+.GM15               Mechanical 15                           
+.GKO                Keep-Out Layer                          
+.GPT                Top Pad Master                          
+.GPB                Bottom Pad Master                       
+.GD1                Drill Drawing                           
+.GG1                Drill Guide                             
+------------------------------------------------------------------------------------------

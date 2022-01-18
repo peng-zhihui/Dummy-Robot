@@ -1,0 +1,7 @@
+DRC Rules Export File for PCB: I:\onWorking\Dummy-Robot\1.Hardware\MotorDriver-57-unused\Motor-57.PcbDoc
+RuleKind=Width|RuleName=VCC|Scope=Board|Minimum=4.00
+RuleKind=Width|RuleName=GND|Scope=Board|Minimum=4.00
+RuleKind=SolderMaskExpansion|RuleName=SolderMaskExpansion|Scope=Board|Minimum=3.00
+RuleKind=Width|RuleName=Width|Scope=Board|Minimum=4.00
+RuleKind=Clearance|RuleName=Clearance|Scope=Board|Minimum=4.00
+RuleKind=ShortCircuit|RuleName=ShortCircuit|Scope=Board|Allowed=0
