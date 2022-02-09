@@ -73,7 +73,7 @@ public:
         char solFlag[8][3];
     };
 
-    DOF6Kinematic(float L_BS, float D_BS, float L_SE, float L_EW, float D_EW, float L_WT);
+    DOF6Kinematic(float L_BS, float D_BS, float L_AM, float L_FA, float D_EW, float L_WT);
 
     bool SolveFK(const Joint6D_t &_inputJoint6D, Pose6D_t &_outputPose6D);
 

@@ -148,7 +148,7 @@ static void UartServerTask(void* ctx)
             HAL_UART_Receive_DMA(&huart5, dma_rx_buffer[1], sizeof(dma_rx_buffer[1]));
         }
         // Fetch the circular buffer "write pointer", where it would write next
-          new_rcv_idx = UART_RX_BUFFER_SIZE - huart5.hdmarx->Instance->NDTR;
+        new_rcv_idx = UART_RX_BUFFER_SIZE - huart5.hdmarx->Instance->NDTR;
 
         // deadline_ms = timeout_to_deadline(PROTOCOL_SERVER_TIMEOUT_MS);
         // Process bytes in one or two chunks (two in case there was a wrap)
@@ -178,14 +178,14 @@ static void UartServerTask(void* ctx)
 
 const osThreadAttr_t uartServerTask_attributes = {
     .name = "UartServerTask",
-    .stack_size = 1000 * 4,
+    .stack_size = 2000,
     .priority = (osPriority_t) osPriorityNormal,
 };
 
 void StartUartServer()
 {
-    // DMA is set up to recieve in a circular buffer forever.
-    // We dont use interrupts to fetch the data, instead we periodically read
+    // DMA is set up to receive in a circular buffer forever.
+    // We don't use interrupts to fetch the data, instead we periodically read
     // data out of the circular buffer into a parse buffer, controlled by a state machine
     HAL_UART_Receive_DMA(&huart4, dma_rx_buffer[0], sizeof(dma_rx_buffer[0]));
     dma_last_rcv_idx[0] = UART_RX_BUFFER_SIZE - huart4.hdmarx->Instance->NDTR;

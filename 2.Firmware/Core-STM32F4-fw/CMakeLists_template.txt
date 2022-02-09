@@ -79,7 +79,6 @@ include_directories(
 )
 
 add_definitions(-DUSE_HAL_DRIVER -DSTM32F4 -DSTM32F4xx -DSTM32F405xx -DconfigAPPLICATION_ALLOCATED_HEAP)
-# add_definitions(-DDEBUG_VIA_USB_SERIAL)
 
 file(GLOB_RECURSE SOURCES
         "startup/*.*"

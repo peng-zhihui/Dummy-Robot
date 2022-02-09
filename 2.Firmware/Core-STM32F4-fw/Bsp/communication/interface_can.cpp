@@ -245,8 +245,6 @@ void CanSendMessage(CAN_context* canCtx, uint8_t* txData, CAN_TxHeaderTypeDef* t
         return;
 
     if (semaphore_status == osOK)
-    {
         HAL_CAN_AddTxMessage(canCtx->handle, txHeader, txData, &canCtx->last_heartbeat_mailbox);
-    }
 }
 

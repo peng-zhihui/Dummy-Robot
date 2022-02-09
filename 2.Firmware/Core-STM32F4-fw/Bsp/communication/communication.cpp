@@ -19,16 +19,14 @@ volatile bool endpointListValid = false;
 osThreadId_t commTaskHandle;
 const osThreadAttr_t commTask_attributes = {
     .name = "commTask",
-    .stack_size = 10000 * 4,
+    .stack_size = 45000,
     .priority = (osPriority_t) osPriorityNormal,
 };
 
 void InitCommunication(void)
 {
-    printf("\r\nHello, REF v%.1f Started!\r\n", CONFIG_FW_VERSION);
-
     // Start command handling thread
-    commTaskHandle = osThreadNew(CommunicationTask, NULL, &commTask_attributes);
+    commTaskHandle = osThreadNew(CommunicationTask, nullptr, &commTask_attributes);
 
     while (!endpointListValid)
         osDelay(1);
@@ -84,12 +82,8 @@ int _write(int file, const char* data, int len);
 // @brief This is what printf calls internally
 int _write(int file, const char* data, int len)
 {
-#ifdef DEBUG_VIA_USB_SERIAL
     usbStreamOutputPtr->process_bytes((const uint8_t*) data, len, nullptr);
     uart4StreamOutputPtr->process_bytes((const uint8_t*) data, len, nullptr);
-#endif
-
-    uart5StreamOutputPtr->process_bytes((const uint8_t*) data, len, nullptr);
 
     return len;
 }

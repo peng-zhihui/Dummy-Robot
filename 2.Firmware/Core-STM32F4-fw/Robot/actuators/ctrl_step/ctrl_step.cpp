@@ -3,9 +3,9 @@
 
 
 CtrlStepMotor::CtrlStepMotor(CAN_HandleTypeDef* _hcan, uint8_t _id, bool _inverse,
-                             uint8_t _reduction, float _minAngle, float _maxAngle) :
+                             uint8_t _reduction, float _angleLimitMin, float _angleLimitMax) :
     nodeID(_id), hcan(_hcan), inverseDirection(_inverse), reduction(_reduction),
-    angleLimitMin(_minAngle), angleLimitMax(_maxAngle)
+    angleLimitMin(_angleLimitMin), angleLimitMax(_angleLimitMax)
 {
     txHeader =
         {
@@ -79,8 +79,6 @@ void CtrlStepMotor::SetVelocitySetPoint(float _val)
 
 void CtrlStepMotor::SetPositionSetPoint(float _val)
 {
-    state = RUNNING;
-
     uint8_t mode = 0x05;
     txHeader.StdId = nodeID << 7 | mode;
 
@@ -88,32 +86,13 @@ void CtrlStepMotor::SetPositionSetPoint(float _val)
     auto* b = (unsigned char*) &_val;
     for (int i = 0; i < 4; i++)
         canBuf[i] = *(b + i);
+    canBuf[4] = 1; // Need ACK
 
     CanSendMessage(get_can_ctx(hcan), canBuf, &txHeader);
 }
 
 
-void CtrlStepMotor::SetPositionWithTime(float _pos, float _time)
-{
-    state = RUNNING;
-
-    uint8_t mode = 0x06;
-    txHeader.StdId = nodeID << 7 | mode;
-
-    // Float to Bytes
-    auto* b = (unsigned char*) &_pos;
-    for (int i = 0; i < 4; i++)
-        canBuf[i] = *(b + i);
-
-    b = (unsigned char*) &_time;
-    for (int i = 4; i < 8; i++)
-        canBuf[i] = *(b + i - 4);
-
-    CanSendMessage(get_can_ctx(hcan), canBuf, &txHeader);
-}
-
-
-void CtrlStepMotor::AddTrajectoryPoint(float _pos, float _vel)
+void CtrlStepMotor::SetPositionWithVelocityLimit(float _pos, float _vel)
 {
     uint8_t mode = 0x07;
     txHeader.StdId = nodeID << 7 | mode;
@@ -122,7 +101,6 @@ void CtrlStepMotor::AddTrajectoryPoint(float _pos, float _vel)
     auto* b = (unsigned char*) &_pos;
     for (int i = 0; i < 4; i++)
         canBuf[i] = *(b + i);
-
     b = (unsigned char*) &_vel;
     for (int i = 4; i < 8; i++)
         canBuf[i] = *(b + i - 4);
@@ -140,6 +118,7 @@ void CtrlStepMotor::SetNodeID(uint32_t _id)
     auto* b = (unsigned char*) &_id;
     for (int i = 0; i < 4; i++)
         canBuf[i] = *(b + i);
+    canBuf[4] = 1; // Need save to EEPROM or not
 
     CanSendMessage(get_can_ctx(hcan), canBuf, &txHeader);
 }
@@ -154,6 +133,7 @@ void CtrlStepMotor::SetCurrentLimit(float _val)
     auto* b = (unsigned char*) &_val;
     for (int i = 0; i < 4; i++)
         canBuf[i] = *(b + i);
+    canBuf[4] = 1; // Need save to EEPROM or not
 
     CanSendMessage(get_can_ctx(hcan), canBuf, &txHeader);
 }
@@ -168,12 +148,13 @@ void CtrlStepMotor::SetVelocityLimit(float _val)
     auto* b = (unsigned char*) &_val;
     for (int i = 0; i < 4; i++)
         canBuf[i] = *(b + i);
+    canBuf[4] = 1; // Need save to EEPROM or not
 
     CanSendMessage(get_can_ctx(hcan), canBuf, &txHeader);
 }
 
 
-void CtrlStepMotor::SetAcceleration(float _val, bool _storeToMem)
+void CtrlStepMotor::SetAcceleration(float _val)
 {
     uint8_t mode = 0x14;
     txHeader.StdId = nodeID << 7 | mode;
@@ -182,7 +163,7 @@ void CtrlStepMotor::SetAcceleration(float _val, bool _storeToMem)
     auto* b = (unsigned char*) &_val;
     for (int i = 0; i < 4; i++)
         canBuf[i] = *(b + i);
-    canBuf[4] = _storeToMem ? 1 : 0;
+    canBuf[4] = 0; // Need save to EEPROM or not
 
     CanSendMessage(get_can_ctx(hcan), canBuf, &txHeader);
 }
@@ -207,12 +188,13 @@ void CtrlStepMotor::SetEnableOnBoot(bool _enable)
     auto* b = (unsigned char*) &val;
     for (int i = 0; i < 4; i++)
         canBuf[i] = *(b + i);
+    canBuf[4] = 1; // Need save to EEPROM or not
 
     CanSendMessage(get_can_ctx(hcan), canBuf, &txHeader);
 }
 
 
-void CtrlStepMotor::SetEnableAck(bool _enable)
+void CtrlStepMotor::SetEnableStallProtect(bool _enable)
 {
     uint8_t mode = 0x1B;
     txHeader.StdId = nodeID << 7 | mode;
@@ -221,20 +203,7 @@ void CtrlStepMotor::SetEnableAck(bool _enable)
     auto* b = (unsigned char*) &val;
     for (int i = 0; i < 4; i++)
         canBuf[i] = *(b + i);
-
-    CanSendMessage(get_can_ctx(hcan), canBuf, &txHeader);
-}
-
-
-void CtrlStepMotor::SetEnableStallProtect(bool _enable)
-{
-    uint8_t mode = 0x1C;
-    txHeader.StdId = nodeID << 7 | mode;
-
-    uint32_t val = _enable ? 1 : 0;
-    auto* b = (unsigned char*) &val;
-    for (int i = 0; i < 4; i++)
-        canBuf[i] = *(b + i);
+    canBuf[4] = 1; // Need save to EEPROM or not
 
     CanSendMessage(get_can_ctx(hcan), canBuf, &txHeader);
 }
@@ -261,19 +230,16 @@ void CtrlStepMotor::EraseConfigs()
 void CtrlStepMotor::SetAngle(float _angle)
 {
     _angle = inverseDirection ? -_angle : _angle;
-    if (_angle <= angleLimitMax && _angle >= angleLimitMin)
-    {
-        float stepMotorCnt = _angle / 360.0f * reduction * CTRL_CIRCLE_COUNT;
-        SetPositionSetPoint(stepMotorCnt);
-    }
+    float stepMotorCnt = _angle / 360.0f * (float) reduction;
+    SetPositionSetPoint(stepMotorCnt);
 }
 
 
-void CtrlStepMotor::SetAngleWithTime(float _angle, float _time)
+void CtrlStepMotor::SetAngleWithVelocityLimit(float _angle, float _vel)
 {
     _angle = inverseDirection ? -_angle : _angle;
-    float stepMotorCnt = _angle / 360.0f * reduction;
-    SetPositionWithTime(stepMotorCnt, _time);
+    float stepMotorCnt = _angle / 360.0f * (float) reduction;
+    SetPositionWithVelocityLimit(stepMotorCnt, _vel);
 }
 
 
@@ -286,10 +252,9 @@ void CtrlStepMotor::UpdateAngle()
 }
 
 
-void CtrlStepMotor::UpdateAngleCallback(float _pos, bool _isAck)
+void CtrlStepMotor::UpdateAngleCallback(float _pos, bool _isFinished)
 {
-    if (_isAck)
-        state = FINISH;
+    state = _isFinished ? FINISH : RUNNING;
 
     float tmp = _pos / (float) reduction * 360;
     angle = inverseDirection ? -tmp : tmp;
@@ -304,6 +269,7 @@ void CtrlStepMotor::SetDceKp(int32_t _val)
     auto* b = (unsigned char*) &_val;
     for (int i = 0; i < 4; i++)
         canBuf[i] = *(b + i);
+    canBuf[4] = 1; // Need save to EEPROM or not
 
     CanSendMessage(get_can_ctx(hcan), canBuf, &txHeader);
 }
@@ -317,6 +283,7 @@ void CtrlStepMotor::SetDceKv(int32_t _val)
     auto* b = (unsigned char*) &_val;
     for (int i = 0; i < 4; i++)
         canBuf[i] = *(b + i);
+    canBuf[4] = 1; // Need save to EEPROM or not
 
     CanSendMessage(get_can_ctx(hcan), canBuf, &txHeader);
 }
@@ -330,6 +297,7 @@ void CtrlStepMotor::SetDceKi(int32_t _val)
     auto* b = (unsigned char*) &_val;
     for (int i = 0; i < 4; i++)
         canBuf[i] = *(b + i);
+    canBuf[4] = 1; // Need save to EEPROM or not
 
     CanSendMessage(get_can_ctx(hcan), canBuf, &txHeader);
 }
@@ -343,6 +311,7 @@ void CtrlStepMotor::SetDceKd(int32_t _val)
     auto* b = (unsigned char*) &_val;
     for (int i = 0; i < 4; i++)
         canBuf[i] = *(b + i);
+    canBuf[4] = 1; // Need save to EEPROM or not
 
     CanSendMessage(get_can_ctx(hcan), canBuf, &txHeader);
 }

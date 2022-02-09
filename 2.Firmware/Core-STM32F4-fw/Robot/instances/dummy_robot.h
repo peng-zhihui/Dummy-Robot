@@ -9,12 +9,12 @@
 /*
   |   PARAMS   | `current_limit` | `acceleration` | `dce_kp` | `dce_kv` | `dce_ki` | `dce_kd` |
   | ---------- | --------------- | -------------- | -------- | -------- | -------- | -------- |
-  | **Joint1** | 1               | 25             | 1000     | 80       | 300      | 250      |
-  | **Joint2** | 1.5             | 25             | 1000     | 250      | 300      | 200      |
-  | **Joint3** | 1               | 25             | 1000     | 350      | 500      | 250      |
-  | **Joint4** | 1.5             | 25             | 1000     | 350      | 500      | 250      |
-  | **Joint5** | 1.5             | 25             | 1000     | 350      | 500      | 250      |
-  | **Joint6** | 1.5             | 25             | 1000     | 350      | 500      | 250      |
+  | **Joint1** | 2               | 30             | 1000     | 80       | 200      | 250      |
+  | **Joint2** | 2               | 30             | 1000     | 80       | 200      | 200      |
+  | **Joint3** | 2               | 30             | 1500     | 80       | 200      | 250      |
+  | **Joint4** | 2               | 30             | 1000     | 80       | 200      | 250      |
+  | **Joint5** | 2               | 30             | 1000     | 80       | 200      | 250      |
+  | **Joint6** | 2               | 30             | 1000     | 80       | 200      | 250      |
  */
 
 
@@ -64,28 +64,68 @@ public:
     {
         COMMAND_TARGET_POINT_SEQUENTIAL = 1,
         COMMAND_TARGET_POINT_INTERRUPTABLE,
-        COMMAND_CONTINUES_TRAJECTORY
+        COMMAND_CONTINUES_TRAJECTORY,
+        COMMAND_MOTOR_TUNING
     };
+
+
+    class TuningHelper
+    {
+    public:
+        explicit TuningHelper(DummyRobot* _context) : context(_context)
+        {
+        }
+
+        void SetTuningFlag(uint8_t _flag);
+        void Tick(uint32_t _timeMillis);
+        void SetFreqAndAmp(float _freq, float _amp);
+
+
+        // Communication protocol definitions
+        auto MakeProtocolDefinitions()
+        {
+            return make_protocol_member_list(
+                make_protocol_function("set_tuning_freq_amp", *this,
+                                       &TuningHelper::SetFreqAndAmp, "freq", "amp"),
+                make_protocol_function("set_tuning_flag", *this,
+                                       &TuningHelper::SetTuningFlag, "flag")
+            );
+        }
+
+
+    private:
+        DummyRobot* context;
+        float time = 0;
+        uint8_t tuningFlag = 0;
+        float frequency = 1;
+        float amplitude = 1;
+    };
+    TuningHelper tuningHelper = TuningHelper(this);
+
 
     // This is the pose when power on.
     const DOF6Kinematic::Joint6D_t REST_POSE = {0, -73, 180, 0, 0, 0};
-    const float DEFAULT_JOINT_SPEED = 30;
-    const float DEFAULT_JOINT_ACCELERATION = 50;
+    const float DEFAULT_JOINT_SPEED = 30;  // degree/s
+    const DOF6Kinematic::Joint6D_t DEFAULT_JOINT_ACCELERATION_BASES = {150, 100, 200, 200, 200, 200};
+    const float DEFAULT_JOINT_ACCELERATION_LOW = 30;    // 0~100
+    const float DEFAULT_JOINT_ACCELERATION_HIGH = 100;  // 0~100
+    const CommandMode DEFAULT_COMMAND_MODE = COMMAND_TARGET_POINT_INTERRUPTABLE;
+
 
     DOF6Kinematic::Joint6D_t currentJoints = REST_POSE;
+    DOF6Kinematic::Joint6D_t targetJoints = REST_POSE;
     DOF6Kinematic::Joint6D_t initPose = REST_POSE;
     DOF6Kinematic::Pose6D_t currentPose6D = {};
     volatile uint8_t jointsStateFlag = 0b00000000;
-    CommandMode commandMode = COMMAND_TARGET_POINT_SEQUENTIAL;
-    bool isStopped = false;
+    CommandMode commandMode = DEFAULT_COMMAND_MODE;
     CtrlStepMotor* motorJ[7] = {nullptr};
     DummyHand* hand = {nullptr};
 
 
-    float MoveJ(float _j1, float _j2, float _j3, float _j4, float _j5, float _j6);
-    float MoveL(float _x, float _y, float _z, float _a, float _b, float _c);
-    void MoveTrajectoryJ(float _j1, float _j2, float _j3, float _j4, float _j5, float _j6);
-    void MoveTrajectoryL(float _x, float _y, float _z, float _a, float _b, float _c);
+    void Init();
+    bool MoveJ(float _j1, float _j2, float _j3, float _j4, float _j5, float _j6);
+    bool MoveL(float _x, float _y, float _z, float _a, float _b, float _c);
+    void MoveJoints(DOF6Kinematic::Joint6D_t _joints);
     void SetJointSpeed(float _speed);
     void SetJointAcceleration(float _acc);
     void UpdateJointAngles();
@@ -97,7 +137,8 @@ public:
     void Homing();
     void Resting();
     bool IsMoving();
-    void SetCommandMode(uint8_t _mode);
+    bool IsEnabled();
+    void SetCommandMode(uint32_t _mode);
 
 
     // Communication protocol definitions
@@ -121,8 +162,8 @@ public:
             make_protocol_function("move_l", *this, &DummyRobot::MoveL, "x", "y", "z", "a", "b", "c"),
             make_protocol_function("set_joint_speed", *this, &DummyRobot::SetJointSpeed, "speed"),
             make_protocol_function("set_joint_acc", *this, &DummyRobot::SetJointAcceleration, "acc"),
-            make_protocol_function("set_command_mode", *this, &DummyRobot::SetCommandMode, "mode")
-
+            make_protocol_function("set_command_mode", *this, &DummyRobot::SetCommandMode, "mode"),
+            make_protocol_object("tuning", tuningHelper.MakeProtocolDefinitions())
         );
     }
 
@@ -133,7 +174,6 @@ public:
         explicit CommandHandler(DummyRobot* _context) : context(_context)
         {
             commandFifo = osMessageQueueNew(16, 64, nullptr);
-            commandLifo = osMessageQueueNew(1, 64, nullptr);
         }
 
         uint32_t Push(const std::string &_cmd);
@@ -142,13 +182,11 @@ public:
         uint32_t GetSpace();
         void ClearFifo();
         void EmergencyStop();
-        void Resume();
 
 
     private:
         DummyRobot* context;
         osMessageQueueId_t commandFifo;
-        osMessageQueueId_t commandLifo;
         char strBuffer[64]{};
     };
     CommandHandler commandHandler = CommandHandler(this);
@@ -157,10 +195,10 @@ public:
 private:
     CAN_HandleTypeDef* hcan;
     float jointSpeed = DEFAULT_JOINT_SPEED;
+    float jointSpeedRatio = 1;
+    DOF6Kinematic::Joint6D_t dynamicJointSpeeds = {1, 1, 1, 1, 1, 1};
     DOF6Kinematic* dof6Solver;
-
-
-    float MoveJoints(DOF6Kinematic::Joint6D_t _joints);
+    bool isEnabled = false;
 };
 
 

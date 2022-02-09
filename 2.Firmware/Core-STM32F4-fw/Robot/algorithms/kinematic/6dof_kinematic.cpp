@@ -82,8 +82,8 @@ static void EulerAngleToRotMat(const float* _eulerAngles, float* _rotationM)
 }
 
 
-DOF6Kinematic::DOF6Kinematic(float L_BS, float D_BS, float L_SE, float L_EW, float D_EW, float L_WT)
-    : armConfig(ArmConfig_t{L_BS, D_BS, L_SE, L_EW, D_EW, L_WT})
+DOF6Kinematic::DOF6Kinematic(float L_BS, float D_BS, float L_AM, float L_FA, float D_EW, float L_WT)
+    : armConfig(ArmConfig_t{L_BS, D_BS, L_AM, L_FA, D_EW, L_WT})
 {
     float tmp_DH_matrix[6][4] = {
         {0.0f,            armConfig.L_BASE,    armConfig.D_BASE, -(float) M_PI_2},
