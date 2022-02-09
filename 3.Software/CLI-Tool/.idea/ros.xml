@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ROSSettings">
+    <option name="rosPath" value="" />
+    <option name="workspacePath" value="" />
+    <option name="additionalSources" value="" />
+    <option name="excludedXmls" value="" />
+    <option name="licenseLinkType" value="Summary" />
+    <option name="knownKeys" value="" />
+    <option name="depSources" value="https://raw.githubusercontent.com/ros/rosdistro/master/rosdep/base.yaml&quot;https://raw.githubusercontent.com/ros/rosdistro/master/rosdep/python.yaml&quot;https://raw.githubusercontent.com/ros/rosdistro/master/rosdep/ruby.yaml" />
+  </component>
+</project>
