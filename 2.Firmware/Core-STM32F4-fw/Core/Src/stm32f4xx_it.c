@@ -255,7 +255,16 @@ void CAN1_TX_IRQHandler(void)
 void CAN1_RX0_IRQHandler(void)
 {
   /* USER CODE BEGIN CAN1_RX0_IRQn 0 */
-
+    if (( READ_REG(hcan1.Instance->IER) & CAN_IT_RX_FIFO0_MSG_PENDING) != 0U)
+    {
+        /* Check if message is still pending */
+        if ((hcan1.Instance->RF0R & CAN_RF0R_FMP0) != 0U)
+        {
+            /* Call weak (surcharged) callback */
+            HAL_CAN_RxFifo0MsgPendingCallback(&hcan1);
+        }
+    }
+    return;
   /* USER CODE END CAN1_RX0_IRQn 0 */
   HAL_CAN_IRQHandler(&hcan1);
   /* USER CODE BEGIN CAN1_RX0_IRQn 1 */

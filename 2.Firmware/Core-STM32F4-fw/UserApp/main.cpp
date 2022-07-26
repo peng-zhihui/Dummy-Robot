@@ -22,17 +22,27 @@ void ThreadControlLoopFixUpdate(void* argument)
         // Suspended here until got Notification.
         ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
 
-        switch (dummy.commandMode)
+        if (dummy.IsEnabled())
         {
-            case DummyRobot::COMMAND_TARGET_POINT_SEQUENTIAL:
-            case DummyRobot::COMMAND_TARGET_POINT_INTERRUPTABLE:
-                dummy.UpdateJointAngles();
-                dummy.UpdateJointPose6D();
-                break;
-            case DummyRobot::COMMAND_CONTINUES_TRAJECTORY:
-                // ToDo: handle trajectory, while update state at the mean time
-                dummy.UpdateJointPose6D();
-                break;
+            // Send control command to Motors & update Joint states
+            switch (dummy.commandMode)
+            {
+                case DummyRobot::COMMAND_TARGET_POINT_SEQUENTIAL:
+                case DummyRobot::COMMAND_TARGET_POINT_INTERRUPTABLE:
+                case DummyRobot::COMMAND_CONTINUES_TRAJECTORY:
+                    dummy.MoveJoints(dummy.targetJoints);
+                    dummy.UpdateJointPose6D();
+                    break;
+                case DummyRobot::COMMAND_MOTOR_TUNING:
+                    dummy.tuningHelper.Tick(10);
+                    dummy.UpdateJointPose6D();
+                    break;
+            }
+        } else
+        {
+            // Just update Joint states
+            dummy.UpdateJointAngles();
+            dummy.UpdateJointPose6D();
         }
     }
 }
@@ -53,14 +63,13 @@ void ThreadOledUpdate(void* argument)
 {
     uint32_t t = micros();
     char buf[16];
-    char cmdModeNames[3][4] = {"SEQ", "INT", "TRJ"};
+    char cmdModeNames[4][4] = {"SEQ", "INT", "TRJ", "TUN"};
 
     for (;;)
     {
         mpu6050.Update(true);
 
         oled.clearBuffer();
-
         oled.setFont(u8g2_font_5x8_tr);
         oled.setCursor(0, 10);
         oled.printf("IMU:%.3f/%.3f", mpu6050.data.ax, mpu6050.data.ay);
@@ -92,10 +101,16 @@ void ThreadOledUpdate(void* argument)
 
         oled.setFont(u8g2_font_10x20_tr);
         oled.setCursor(0, 78);
-        for (int i = 1; i <= 6; i++)
-            buf[i - 1] = (dummy.jointsStateFlag & (1 << i) ? '*' : '_');
-        buf[6] = 0;
-        oled.printf("[%s] %s", cmdModeNames[dummy.commandMode - 1], buf);
+        if (dummy.IsEnabled())
+        {
+            for (int i = 1; i <= 6; i++)
+                buf[i - 1] = (dummy.jointsStateFlag & (1 << i) ? '*' : '_');
+            buf[6] = 0;
+            oled.printf("[%s] %s", cmdModeNames[dummy.commandMode - 1], buf);
+        } else
+        {
+            oled.printf("[%s] %s", cmdModeNames[dummy.commandMode - 1], "======");
+        }
 
         oled.sendBuffer();
     }
@@ -116,8 +131,11 @@ void OnTimer7Callback()
 /* Default Entry -------------------------------------------------------*/
 void Main(void)
 {
-    // Init all communication staff, include USB-CDC/VCP/UART/CAN etc.
+    // Init all communication staff, including USB-CDC/VCP/UART/CAN etc.
     InitCommunication();
+
+    // Init Robot.
+    dummy.Init();
 
     // Init IMU.
     do
@@ -134,7 +152,7 @@ void Main(void)
     // Init & Run User Threads.
     const osThreadAttr_t controlLoopTask_attributes = {
         .name = "ControlLoopFixUpdateTask",
-        .stack_size = 1000 * 4,
+        .stack_size = 2000,
         .priority = (osPriority_t) osPriorityRealtime,
     };
     controlLoopFixUpdateHandle = osThreadNew(ThreadControlLoopFixUpdate, nullptr,
@@ -142,7 +160,7 @@ void Main(void)
 
     const osThreadAttr_t ControlLoopUpdateTask_attributes = {
         .name = "ControlLoopUpdateTask",
-        .stack_size = 1000 * 4,
+        .stack_size = 2000,
         .priority = (osPriority_t) osPriorityNormal,
     };
     ControlLoopUpdateHandle = osThreadNew(ThreadControlLoopUpdate, nullptr,
@@ -150,7 +168,7 @@ void Main(void)
 
     const osThreadAttr_t oledTask_attributes = {
         .name = "OledTask",
-        .stack_size = 1000 * 4,
+        .stack_size = 2000,
         .priority = (osPriority_t) osPriorityNormal,   // should >= Normal
     };
     oledTaskHandle = osThreadNew(ThreadOledUpdate, nullptr, &oledTask_attributes);
@@ -160,5 +178,6 @@ void Main(void)
     timerCtrlLoop.Start();
 
     // System started, light switch-led up.
+    Respond(*uart4StreamOutputPtr, "[sys] Heap remain: %d Bytes\n", xPortGetMinimumEverFreeHeapSize());
     pwm.SetDuty(PWM::CH_A1, 0.5);
 }

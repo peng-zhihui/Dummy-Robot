@@ -62,7 +62,7 @@ osSemaphoreId sem_can2_tx;
 osThreadId_t defaultTaskHandle;
 const osThreadAttr_t defaultTask_attributes = {
   .name = "defaultTask",
-  .stack_size = 500 * 4,
+  .stack_size = 2000,
   .priority = (osPriority_t) osPriorityNormal,
 };
 
@@ -126,7 +126,7 @@ void MX_FREERTOS_Init(void) {
     // This Task must run before MX_USB_DEVICE_Init(), so have to put it here.
     const osThreadAttr_t usbIrqTask_attributes = {
         .name = "usbIrqTask",
-        .stack_size = 128 * 4,
+        .stack_size = 500,
         .priority = (osPriority_t) osPriorityAboveNormal,
     };
     usbIrqTaskHandle = osThreadNew(UsbDeferredInterruptTask, NULL, &usbIrqTask_attributes);
