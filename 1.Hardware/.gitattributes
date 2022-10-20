@@ -1,0 +1,59 @@
+# author: GitHub@TitanRGB
+# This document allows GitHub to correctly identify Altium Designer, KiCAD, Gerber and Eagle documents and add them to GitHub Repository's language statistics.  
+# 这个文档可以使GitHub正确的识别Altium Designer、KiCAD、Gerber以及Eagle的文档，并将它们加入到GitHub Repository的语言统计中。
+
+# https://gist.github.com/TitanRGB/61c37bf71159cc9a511558ec7c218339
+
+*.OutJob linguist-detectable=true
+*.PcbDoc linguist-detectable=true
+*.PrjPCB linguist-detectable=true
+*.SchDoc linguist-detectable=true
+*.outjob linguist-detectable=true
+*.pcbdoc linguist-detectable=true
+*.prjpcb linguist-detectable=true
+*.schdoc linguist-detectable=true
+*.PCB linguist-detectable=true
+*.sch linguist-detectable=true
+*.lib linguist-detectable=true
+*.epf linguist-detectable=true
+*.brd linguist-detectable=true
+*.pro linguist-detectable=true
+*.gbr linguist-detectable=true
+*.cmp linguist-detectable=true
+*.gbl linguist-detectable=true
+*.gbo linguist-detectable=true
+*.gbp linguist-detectable=true
+*.gbs linguist-detectable=true
+*.gko linguist-detectable=true
+*.gml linguist-detectable=true
+*.gpb linguist-detectable=true
+*.gpt linguist-detectable=true
+*.gtl linguist-detectable=true
+*.gto linguist-detectable=true
+*.gtp linguist-detectable=true
+*.gts linguist-detectable=true
+*.ncl linguist-detectable=true
+*.sol linguist-detectable=true
+*.GBR linguist-detectable=true
+*.CMP linguist-detectable=true
+*.GBL linguist-detectable=true
+*.GBO linguist-detectable=true
+*.GBP linguist-detectable=true
+*.GBS linguist-detectable=true
+*.GKO linguist-detectable=true
+*.GML linguist-detectable=true
+*.GBP linguist-detectable=true
+*.GPT linguist-detectable=true
+*.GTL linguist-detectable=true
+*.GTO linguist-detectable=true
+*.GTP linguist-detectable=true
+*.GTS linguist-detectable=true
+*.NCL linguist-detectable=true
+*.SOL linguist-detectable=true
+*.kicad_pcb linguist-detectable=true
+*.pro linguist-detectable=true
+*.obj linguist-detectable=true
+*.stl linguist-detectable=true
+*.md linguist-detectable=true
+*.dxf linguist-detectable=true
+*.dwg linguist-detectable=true
