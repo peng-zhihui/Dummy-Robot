@@ -243,9 +243,6 @@ void MotionPlanner::PositionTracker::CalcSoftGoal(int32_t _goalPosition)
                             velocityIntegral = 0;
                             trackVelocity = context->config->ratedVelocity;
                         }
-                    } else if (trackVelocity > context->config->ratedVelocity)
-                    {
-                        CalcVelocityIntegral(-velocityDownAcc);
                     }
                 } else
                 {
@@ -282,9 +279,6 @@ void MotionPlanner::PositionTracker::CalcSoftGoal(int32_t _goalPosition)
                             velocityIntegral = 0;
                             trackVelocity = -context->config->ratedVelocity;
                         }
-                    } else if (trackVelocity < -context->config->ratedVelocity)
-                    {
-                        CalcVelocityIntegral(velocityDownAcc);
                     }
                 } else
                 {
