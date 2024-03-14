@@ -5,6 +5,9 @@ see protocol.md for the protocol specification
 #ifndef __PROTOCOL_HPP
 #define __PROTOCOL_HPP
 
+#include <cstdio>
+
+
 // TODO: resolve assert
 #define assert(expr)
 
