@@ -37,9 +37,9 @@ private:
 
 
     /***** Port Specified Implements *****/
-    virtual void SpiInit();
+    virtual void SpiInit() = 0;
 
-    virtual uint16_t SpiTransmitAndRead16Bits(uint16_t _dataTx);
+    virtual uint16_t SpiTransmitAndRead16Bits(uint16_t _dataTx) = 0;
 
 };
 
