@@ -1,6 +1,8 @@
 #ifndef REF_STM32F4_FW_DUMMY_ROBOT_H
 #define REF_STM32F4_FW_DUMMY_ROBOT_H
 
+#include <string>
+
 #include "algorithms/kinematic/6dof_kinematic.h"
 #include "actuators/ctrl_step/ctrl_step.hpp"
 

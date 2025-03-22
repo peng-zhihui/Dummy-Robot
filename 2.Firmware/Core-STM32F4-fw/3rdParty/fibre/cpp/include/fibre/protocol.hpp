@@ -8,6 +8,8 @@ see protocol.md for the protocol specification
 // TODO: resolve assert
 #define assert(expr)
 
+#include <cstdio>
+
 #include <functional>
 #include <limits>
 #include <cmath>
